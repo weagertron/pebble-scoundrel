@@ -13,23 +13,23 @@
 #define HP_BAR_H         6
 
 #define CARD_W           88
-#define CARD_H           96
-#define CARD_GAP         8
+#define CARD_H           70
+#define CARD_GAP         6
 #define CARD_MARGIN      8
-#define CARD_GRID_Y      34
+#define CARD_GRID_Y      32
 
 // Card grid positions (2×2)
 // Row 0: slots 0,1  Row 1: slots 2,3
 #define CARD_X(i)  (CARD_MARGIN + ((i) % 2) * (CARD_W + CARD_GAP))
 #define CARD_Y(i)  (CARD_GRID_Y + ((i) / 2) * (CARD_H + CARD_GAP))
 
-#define ACTION_Y         192
-#define ACTION_H         36
-#define ACTION_BTN_W     60
+#define ACTION_Y         182
+#define ACTION_H         30
+#define ACTION_BTN_W     56
 #define ACTION_GAP       4
 
-#define INFO_Y           210
-#define INFO_H           18
+#define INFO_Y           212
+#define INFO_H           16
 
 // ──────────────────────────────────────────────
 // Drawing functions

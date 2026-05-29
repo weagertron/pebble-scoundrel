@@ -21,16 +21,16 @@ static bool s_last_continue = false;
 static const char *MENU_LABELS[] = {"New Game", "Continue", "Rules"};
 
 // Layout
-#define TITLE_Y         40
+#define TITLE_Y         30
 #define TITLE_TEXT_H    30
-#define MENU_START_Y    100
-#define MENU_H          36
-#define MENU_MARGIN     8
+#define SYMBOLS_Y       (TITLE_Y + TITLE_TEXT_H + 14)
+#define SUBTITLE_Y      (SYMBOLS_Y + 14)
+#define MENU_START_Y    (SUBTITLE_Y + 28)
+#define MENU_H          32
+#define MENU_MARGIN     16
 
 // ──────────────────────────────────────────────
 // Canvas drawing
-// ──────────────────────────────────────────────
-
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
 
@@ -46,43 +46,38 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
                      GTextOverflowModeWordWrap, GTextAlignmentCenter, NULL);
 
   // Decorative suit symbols under title
-  GPoint symbols_y = GPoint(SCREEN_W / 2, TITLE_Y + TITLE_TEXT_H + 12);
-  render_suit_symbol(ctx, GPoint(symbols_y.x - 30, symbols_y.y), 8, SUIT_SPADES);
-  render_suit_symbol(ctx, GPoint(symbols_y.x - 10, symbols_y.y), 8, SUIT_HEARTS);
-  render_suit_symbol(ctx, GPoint(symbols_y.x + 10, symbols_y.y), 8, SUIT_DIAMONDS);
-  render_suit_symbol(ctx, GPoint(symbols_y.x + 30, symbols_y.y), 8, SUIT_CLUBS);
+  render_suit_symbol(ctx, GPoint(SCREEN_W / 2 - 30, SYMBOLS_Y), 8, SUIT_SPADES);
+  render_suit_symbol(ctx, GPoint(SCREEN_W / 2 - 10, SYMBOLS_Y), 8, SUIT_HEARTS);
+  render_suit_symbol(ctx, GPoint(SCREEN_W / 2 + 10, SYMBOLS_Y), 8, SUIT_DIAMONDS);
+  render_suit_symbol(ctx, GPoint(SCREEN_W / 2 + 30, SYMBOLS_Y), 8, SUIT_CLUBS);
 
   // Subtitle
   GFont sub_font = fonts_get_system_font(FONT_KEY_GOTHIC_14);
   graphics_context_set_text_color(ctx, GColorLightGray);
   graphics_draw_text(ctx, "A dungeon crawl card game", sub_font,
-                     GRect(0, TITLE_Y + TITLE_TEXT_H + 26, SCREEN_W, 18),
+                     GRect(0, SUBTITLE_Y, SCREEN_W, 18),
                      GTextOverflowModeWordWrap, GTextAlignmentCenter, NULL);
 
   // Menu items
   int visible_count = s_has_save ? MENU_COUNT : MENU_COUNT - 1;
   int menu_start = MENU_START_Y;
-  // Center menu vertically if "Continue" is hidden
-  if (!s_has_save) {
-    menu_start -= MENU_H / 2;
-  }
 
   for (int i = 0; i < visible_count; i++) {
-    int menu_idx = s_has_save ? i : (i == 0 ? 0 : i + 1); // skip MENU_CONTINUE
-    if (!s_has_save && i == 0) menu_idx = MENU_NEW_GAME;
-    if (!s_has_save && i == 1) menu_idx = MENU_RULES;
+    // Map visual index to menu item index
+    int menu_idx;
+    if (s_has_save) {
+      menu_idx = i; // 0=New, 1=Continue, 2=Rules
+    } else {
+      menu_idx = (i == 0) ? MENU_NEW_GAME : MENU_RULES;
+    }
 
-    // Hmm, let me simplify: just draw the visible menu items
-    GRect item_rect = GRect(MENU_MARGIN, menu_start + i * (MENU_H + 4),
+    GRect item_rect = GRect(MENU_MARGIN, menu_start + i * (MENU_H + 6),
                             SCREEN_W - 2 * MENU_MARGIN, MENU_H);
-
     bool selected = (i == s_selected);
 
-    // Button background
     graphics_context_set_fill_color(ctx, selected ? GColorWhite : GColorDarkGray);
     graphics_fill_rect(ctx, item_rect, 4, GCornersAll);
 
-    // Text
     graphics_context_set_text_color(ctx, selected ? GColorBlack : GColorWhite);
     GFont menu_font = fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD);
     graphics_draw_text(ctx, MENU_LABELS[menu_idx], menu_font, item_rect,

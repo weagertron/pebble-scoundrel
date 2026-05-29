@@ -26,10 +26,10 @@ const char *card_suit_char(const Card *card) {
 
 const char *card_value_str(const Card *card) {
   switch (card->value) {
-    case 11: return "J";
-    case 12: return "Q";
-    case 13: return "K";
-    case 14: return "A";
+    case 11: return "J(11)";
+    case 12: return "Q(12)";
+    case 13: return "K(13)";
+    case 14: return "A(14)";
     default: {
       static char buf[4];
       snprintf(buf, sizeof(buf), "%d", card->value);

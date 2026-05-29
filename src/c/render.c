@@ -59,23 +59,26 @@ void render_card(GContext *ctx, const Card *card, GRect rect, bool selected, boo
     graphics_draw_round_rect(ctx, sel, 6);
   }
 
-  // Value text (top-left)
+  // Value text (top-left) — use smaller font for face cards to fit "(12)"
   graphics_context_set_text_color(ctx, suit_color);
   const char *val_str = card_value_str(card);
-  GFont val_font = fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD);
-  GRect val_rect = GRect(rect.origin.x + 6, rect.origin.y + 4, 40, 24);
+  bool is_face = (card->value > 10);
+  GFont val_font = is_face
+    ? fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD)
+    : fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD);
+  GRect val_rect = GRect(rect.origin.x + 4, rect.origin.y + 2, 52, is_face ? 20 : 24);
   graphics_draw_text(ctx, val_str, val_font, val_rect,
                      GTextOverflowModeWordWrap, GTextAlignmentLeft, NULL);
 
   // Suit symbol (center)
   GPoint center = GPoint(rect.origin.x + rect.size.w / 2,
-                         rect.origin.y + rect.size.h / 2 + 4);
-  render_suit_symbol(ctx, center, 20, card->suit);
+                         rect.origin.y + rect.size.h / 2 + 2);
+  render_suit_symbol(ctx, center, 16, card->suit);
 
-  // Small value bottom-right (upside down conceptually, but just placed)
+  // Small value bottom-right
   GFont small_font = fonts_get_system_font(FONT_KEY_GOTHIC_14);
-  GRect val_rect2 = GRect(rect.origin.x + rect.size.w - 30,
-                           rect.origin.y + rect.size.h - 20, 24, 16);
+  GRect val_rect2 = GRect(rect.origin.x + 4,
+                           rect.origin.y + rect.size.h - 18, rect.size.w - 8, 16);
   graphics_draw_text(ctx, val_str, small_font, val_rect2,
                      GTextOverflowModeWordWrap, GTextAlignmentRight, NULL);
 
@@ -87,7 +90,7 @@ void render_card(GContext *ctx, const Card *card, GRect rect, bool selected, boo
     case CARD_WEAPON: role_str = "W"; break;
     case CARD_MONSTER: role_str = "!"; break;
   }
-  GRect role_rect = GRect(rect.origin.x + rect.size.w - 20, rect.origin.y + 4, 16, 16);
+  GRect role_rect = GRect(rect.origin.x + rect.size.w - 16, rect.origin.y + 4, 12, 14);
   graphics_context_set_text_color(ctx, suit_color);
   graphics_draw_text(ctx, role_str, small_font, role_rect,
                      GTextOverflowModeWordWrap, GTextAlignmentRight, NULL);
