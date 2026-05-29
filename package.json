@@ -1,0 +1,26 @@
+{
+  "name": "scoundrel",
+  "author": "Scoundrel Contributors",
+  "version": "1.0.0",
+  "description": "A solo dungeon-crawl card game for Pebble Time 2. Survive 44 cards with weapons, potions, and cunning.",
+  "keywords": ["pebble-app", "game", "cards"],
+  "private": false,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "Scoundrel",
+    "uuid": "a7c3f12e-5b89-4d6a-b1c0-9e8f7d6c5b4a",
+    "sdkVersion": "3",
+    "targetPlatforms": ["emery"],
+    "watchapp": {
+      "watchface": false
+    },
+    "messageKeys": [],
+    "resources": {
+      "media": [
+        { "type": "bitmap", "name": "APP_ICON", "file": "images/app_icon.png", "menuIcon": true },
+        { "type": "font",   "name": "FONT_PIXEL_14", "file": "fonts/press-start-2p.ttf" },
+        { "type": "font",   "name": "FONT_PIXEL_20", "file": "fonts/press-start-2p.ttf" }
+      ]
+    }
+  }
+}
