@@ -2,6 +2,10 @@
 #include "../render.h"
 #include <stdio.h>
 
+#ifdef PBL_TOUCH
+#include <pebble.h>
+#endif
+
 // ──────────────────────────────────────────────
 // Static state
 // ──────────────────────────────────────────────
@@ -95,6 +99,52 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
 }
 
 // ──────────────────────────────────────────────
+// Touch handling (Emery / PBL_TOUCH)
+// ──────────────────────────────────────────────
+
+#ifdef PBL_TOUCH
+
+#define TAP_MAX_DRIFT 20
+
+static void touch_handler(const TouchEvent *event, void *context) {
+  static int16_t s_down_x = 0, s_down_y = 0;
+
+  switch (event->type) {
+    case TouchEvent_Touchdown:
+      s_down_x = event->x;
+      s_down_y = event->y;
+      break;
+
+    case TouchEvent_Liftoff: {
+      int16_t dx = event->x - s_down_x;
+      int16_t dy = event->y - s_down_y;
+      if (dx * dx + dy * dy > TAP_MAX_DRIFT * TAP_MAX_DRIFT) break;
+
+      int16_t tx = s_down_x;
+      int16_t ty = s_down_y;
+
+      for (int i = 0; i < MENU_COUNT; i++) {
+        GRect item_rect = GRect(MENU_MARGIN, MENU_START_Y + i * (MENU_H + 4),
+                                SCREEN_W - 2 * MENU_MARGIN, MENU_H);
+        if (tx >= item_rect.origin.x && tx < item_rect.origin.x + item_rect.size.w &&
+            ty >= item_rect.origin.y && ty < item_rect.origin.y + item_rect.size.h) {
+          s_selected = i;
+          layer_mark_dirty(s_canvas);
+          select_handler(NULL, NULL);
+          return;
+        }
+      }
+      break;
+    }
+
+    default:
+      break;
+  }
+}
+
+#endif // PBL_TOUCH
+
+// ──────────────────────────────────────────────
 // Button handling
 // ──────────────────────────────────────────────
 
@@ -138,9 +188,18 @@ static void window_load_handler(Window *window) {
   s_canvas = layer_create(bounds);
   layer_set_update_proc(s_canvas, canvas_update_proc);
   layer_add_child(root, s_canvas);
+
+  #ifdef PBL_TOUCH
+  if (touch_service_is_enabled()) {
+    touch_service_subscribe(touch_handler, NULL);
+  }
+  #endif
 }
 
 static void window_unload_handler(Window *window) {
+  #ifdef PBL_TOUCH
+  touch_service_unsubscribe();
+  #endif
   layer_destroy(s_canvas);
   s_canvas = NULL;
   window_destroy(s_window);
